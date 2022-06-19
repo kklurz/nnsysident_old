@@ -1,6 +1,8 @@
+import re
 import numpy as np
+import torch
+import random
 import torch.utils.data as utils
-
 from neuralpredictors.data.samplers import RepeatsBatchSampler
 
 
@@ -49,3 +51,13 @@ def unpack_data_info(data_info):
     input_channels = [v["input_channels"] for k, v in data_info.items()]
     n_neurons_dict = {k: v["output_dimension"] for k, v in data_info.items()}
     return n_neurons_dict, in_shapes_dict, input_channels
+
+
+def set_seed(seed):
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    random.seed(seed)
+
+
+def extract_data_key(path):
+    return "-".join((re.findall(r"\d+", path)[:3] + ["0"]))
