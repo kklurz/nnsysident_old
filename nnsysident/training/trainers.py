@@ -3,7 +3,7 @@ import numpy as np
 import torch
 from tqdm import tqdm
 
-from neuralpredictors import measures as mlmeasures
+from neuralpredictors.measures import modules as mlmeasures
 from neuralpredictors.training import early_stopping, MultipleObjectiveTracker, LongCycler
 from nnfabrik.utility.nn_helpers import set_random_seed
 
