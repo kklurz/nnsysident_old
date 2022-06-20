@@ -2,16 +2,17 @@ import numpy as np
 import copy
 from ..utility.data_helpers import unpack_data_info
 from neuralpredictors.layers.cores import TransferLearningCore, SE2dCore
-from neuralpredictors.layers.encoders.firing_rate import FiringRateEncoder as Encoder
+# from neuralpredictors.layers.encoders.firing_rate import FiringRateEncoder
 from neuralpredictors.utils import get_module_output
 from nnfabrik.utility.nn_helpers import set_random_seed, get_dims_for_loader_dict
 from neuralpredictors.layers.readouts import (
     MultiReadoutBase,
     MultiReadoutSharedParametersBase,
-    FullGaussian2d,
+    # FullGaussian2d,
     PointPooled2d,
     FullFactorized2d,
 )
+from .feature_out_models import FiringRateEncoder_, FullGaussian2d_
 
 
 class MultiplePointPooled2d(MultiReadoutBase):
@@ -19,7 +20,7 @@ class MultiplePointPooled2d(MultiReadoutBase):
 
 
 class MultipleFullGaussian2d(MultiReadoutSharedParametersBase):
-    _base_readout = FullGaussian2d
+    _base_readout = FullGaussian2d_
 
 
 class MultipleSpatialXFeatureLinear(MultiReadoutBase):
@@ -214,7 +215,7 @@ def se2d_fullgaussian2d(
     # Use the mean activity to initialize the readout bias
     mean_activity_dict = get_mean_activity_dict(dataloaders) if readout_bias and data_info is None else None
 
-    readout = MultipleFullGaussian2d(
+    readout_kwargs = dict(
         in_shape_dict=in_shape_dict,
         n_neurons_dict=n_neurons_dict,
         mean_activity_dict=mean_activity_dict,
@@ -233,8 +234,9 @@ def se2d_fullgaussian2d(
         init_noise=init_noise,
         init_transform_scale=init_transform_scale,
     )
-    model = Encoder(core=core, readout=readout, elu_offset=elu_offset)
 
+    readout = MultipleFullGaussian2d(**readout_kwargs)
+    model = FiringRateEncoder_(core=core, readout=readout, elu_offset=elu_offset)
     return model
 
 
@@ -340,7 +342,7 @@ def se2d_pointpooled(
         init_range=init_range,
     )
 
-    model = Encoder(core=core, readout=readout, elu_offset=elu_offset)
+    model = FiringRateEncoder_(core=core, readout=readout, elu_offset=elu_offset)
 
     return model
 
@@ -438,7 +440,7 @@ def se2d_spatialxfeaturelinear(
         normalize=normalize,
     )
 
-    model = Encoder(core=core, readout=readout, elu_offset=elu_offset)
+    model = FiringRateEncoder_(core=core, readout=readout, elu_offset=elu_offset)
 
     return model
 
@@ -560,7 +562,7 @@ def se2d_fullSXF(
         shared_match_ids=shared_match_ids,
     )
 
-    model = Encoder(core=core, readout=readout, elu_offset=elu_offset)
+    model = FiringRateEncoder_(core=core, readout=readout, elu_offset=elu_offset)
 
     return model
 
@@ -727,7 +729,7 @@ def taskdriven_fullgaussian2d(
         init_transform_scale=init_transform_scale,
     )
 
-    model = Encoder(core=core, readout=readout, elu_offset=elu_offset)
+    model = FiringRateEncoder_(core=core, readout=readout, elu_offset=elu_offset)
 
     return model
 
@@ -821,6 +823,6 @@ def taskdriven_fullSXF(
         shared_match_ids=shared_match_ids,
     )
 
-    model = Encoder(core=core, readout=readout, elu_offset=elu_offset)
+    model = FiringRateEncoder_(core=core, readout=readout, elu_offset=elu_offset)
 
     return model
