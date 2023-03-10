@@ -217,19 +217,20 @@ def standard_trainer(
     tracker.finalize() if track_training else None
 
     # store relevant data
-    output = {"tracker_output": {k: v for k, v in tracker.log.items()}} if track_training else {}
+    output = {
+        "tracker_output": {k: v for k, v in tracker.log.items()} if track_training else {},
+        "best_model_stats": {"correlation": {}, "loss": {}},
+    }
     for tier in ["train", "validation", "test"]:
         output["best_model_stats"]["correlation"][tier] = measures.get_correlations(
             model, dataloaders[tier], device=device, as_dict=False, per_neuron=False
         )
-        output["best_model_stats"]["loss"][tier] = partial(
-            measures.get_loss,
+        output["best_model_stats"]["loss"][tier] = measures.get_loss(
             model,
             dataloaders[tier],
+            loss_function,
             device=device,
             per_neuron=False,
-            avg=False,
-            loss_function=loss_function,
         )
 
     score = (
